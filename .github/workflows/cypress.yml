@@ -27,7 +27,8 @@ jobs:
 
       # Step 4: Run Cypress tests
       - name: Run Cypress tests
-        run:npx cypress run --spec "cypress/e2e/taxapp.cy.js"
+        - name: Run Cypress tests
+  	run: npx cypress run --spec "cypress/e2e/taxapp.cy.js"
 
       # Step 5: Generate Mochawesome report
       - name: Generate Mochawesome report
