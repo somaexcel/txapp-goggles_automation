@@ -39,3 +39,40 @@ jobs:
         with:
           name: mochawesome-report
           path: cypress/reports/
+      
+      - name: Extract test summary
+        if: always()
+        run: |
+          PASSED=$(grep -o '"passes":[0-9]*' cypress/reports/.jsons/*.json | head -1 | grep -o '[0-9]*')
+          FAILED=$(grep -o '"failures":[0-9]*' cypress/reports/.jsons/*.json | head -1 | grep -o '[0-9]*')
+          echo "PASSED=$PASSED" >> $GITHUB_ENV
+          echo "FAILED=$FAILED" >> $GITHUB_ENV
+
+      # Step: Send Slack notification
+      - name: Notify Slack
+        if: always()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            STATUS="✅ PASSED"
+            COLOR="good"
+          else
+            STATUS="❌ FAILED"
+            COLOR="danger"
+          fi
+
+          REPORT_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{
+            \"attachments\": [{
+              \"color\": \"$COLOR\",
+              \"title\": \"Cypress Test Run: $STATUS\",
+              \"fields\": [
+                {\"title\": \"Passed\", \"value\": \"${{ env.PASSED }}\", \"short\": true},
+                {\"title\": \"Failed\", \"value\": \"${{ env.FAILED }}\", \"short\": true}
+              ]
+            }]
+          }" \
+          $SLACK_WEBHOOK    
