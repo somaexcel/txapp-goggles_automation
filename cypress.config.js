@@ -2,7 +2,7 @@ const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
   e2e: {
-    baseUrl: "http://localhost:3000",
+    baseUrl: "http:https://taxquarterly.com/",
     supportFile: "cypress/support/e2e.js",
     screenshotOnRunFailure: true,
     video: false,
