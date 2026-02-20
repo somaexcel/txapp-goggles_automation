@@ -1,13 +1,13 @@
 describe('Tax Application website navigation', () => {
   it('Navigated to tax quarterly website', () => {
-    cy.visit('http://localhost:3000/')
+    cy.visit('https://taxquarterly.com/')
 
   })
 })
 
 describe('Form Interaction Test', () => {
   it('Fill out quarterly tax form and submit', () => {
-    cy.visit('http://localhost:3000/')
+    cy.visit('https://taxquarterly.com/')
 
     cy.get('#filingStatus').select('mfj')
     cy.get('#state').select('AR')
