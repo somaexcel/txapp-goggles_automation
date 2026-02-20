@@ -25,6 +25,15 @@ jobs:
       - name: Run Cypress tests
         run: npx cypress run --spec "cypress/e2e/taxapp.cy.js"
 
+      - name: Debug report files
+        run: |
+          echo "===== REPORT TREE ====="
+          pwd
+          ls -la
+          ls -la cypress
+          ls -la cypress/reports
+          ls -R cypress/reports || true
+          
       - name: Upload Mochawesome report
         uses: actions/upload-artifact@v4
         with:
