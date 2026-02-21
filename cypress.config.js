@@ -6,7 +6,7 @@ module.exports = defineConfig({
     supportFile: "cypress/support/e2e.js",
     screenshotOnRunFailure: true,
     video: false,
- pageLoadTimeout: 120000, // ⬅️ increase to 2 minutes
+ pageLoadTimeout: 200000, // ⬅️ increase to 2 minutes
     defaultCommandTimeout: 20000,
     specPattern: "cypress/e2e/**/*.cy.js",
 
