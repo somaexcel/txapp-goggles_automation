@@ -43,8 +43,14 @@ jobs:
       - name: Extract test summary
         if: always()
         run: |
-          PASSED=$(grep -o '"passes":[0-9]*' cypress/reports/.jsons/*.json | head -1 | grep -o '[0-9]*')
-          FAILED=$(grep -o '"failures":[0-9]*' cypress/reports/.jsons/*.json | head -1 | grep -o '[0-9]*')
+          if ls cypress/reports/.jsons/*.json 1> /dev/null 2>&1; then
+            PASSED=$(grep -o '"passes":[0-9]*' cypress/reports/.jsons/*.json | head -1 | grep -o '[0-9]*')
+            FAILED=$(grep -o '"failures":[0-9]*' cypress/reports/.jsons/*.json | head -1 | grep -o '[0-9]*')
+          else
+            PASSED=0
+            FAILED=0
+          fi
+
           echo "PASSED=$PASSED" >> $GITHUB_ENV
           echo "FAILED=$FAILED" >> $GITHUB_ENV
 
@@ -54,6 +60,11 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run: |
+          if [ -z "$SLACK_WEBHOOK" ]; then
+            echo "Slack webhook not set — skipping"
+            exit 0
+          fi
+
           if [ "${{ job.status }}" == "success" ]; then
             STATUS="✅ PASSED"
             COLOR="good"
@@ -71,8 +82,9 @@ jobs:
               \"title\": \"Cypress Test Run: $STATUS\",
               \"fields\": [
                 {\"title\": \"Passed\", \"value\": \"${{ env.PASSED }}\", \"short\": true},
-                {\"title\": \"Failed\", \"value\": \"${{ env.FAILED }}\", \"short\": true}
+                {\"title\": \"Failed\", \"value\": \"${{ env.FAILED }}\", \"short\": true},
+                {\"title\": \"Report\", \"value\": \"$REPORT_URL\"}
               ]
             }]
           }" \
-          $SLACK_WEBHOOK    
+          "$SLACK_WEBHOOK"   
