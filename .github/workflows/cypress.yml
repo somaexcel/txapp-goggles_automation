@@ -32,16 +32,18 @@ jobs:
       - name: Run Cypress tests
         run: npx cypress run --spec "cypress/e2e/taxapp.cy.js"
 
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       # 5️⃣ Extract results safely
       - name: Extract Test Results
         run: |
           JSON_FILE=$(ls cypress/reports/.jsons/*.json 2>/dev/null | head -1)
 
           if [ -f "$JSON_FILE" ]; then
-            PASSED=$(grep -o '"passes":[0-9]*' "$JSON_FILE" | head -1 | grep -o '[0-9]*')
-            FAILED=$(grep -o '"failures":[0-9]*' "$JSON_FILE" | head -1 | grep -o '[0-9]*')
+            PASSED=$(jq '.stats.passes' "$JSON_FILE")
+            FAILED=$(jq '.stats.failures' "$JSON_FILE")
           else
-            echo "No JSON found — defaulting to 0"
             PASSED=0
             FAILED=0
           fi
